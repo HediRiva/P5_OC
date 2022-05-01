@@ -1,9 +1,8 @@
 /* Récupération de l'id du produit dans l'url*/
-const productStringId = window.location.search;
-const productParams = new URLSearchParams(productStringId);
+const productParams = new URL(document.location).searchParams;
 const productId = productParams.get('id');
 
-/*Requête de l'API pour récupérer le produit selon son id*/
+/* Requête de l'API pour récupérer le produit selon son id*/
 fetch(`http://localhost:3000/api/products/${productId}`)
   .then((response) => response.json())
   .then((productData) => {
@@ -30,6 +29,7 @@ fetch(`http://localhost:3000/api/products/${productId}`)
     console.log('Il y a une erreur : ' + error);
   });
 
+/**  fonction d'ajout au panier du produit choisi */
 function addToBasket() {
   /* Ecoute du clic du bouton 'Ajouter au panier' de la page produit */
   const addToBasketBtn = document.querySelector('#addToCart');
@@ -41,7 +41,6 @@ function addToBasket() {
     let selectedItem = {
       id: productId,
       name: productName,
-      // price: productPrice,
       color: selectedColor,
       quantity: Number(selectedQty),
     };
@@ -72,7 +71,7 @@ function addToBasket() {
   });
 }
 
-/*  */
+/*  Récupération des données présentes dans le localStorage en valeur JavaScript */
 function getBasket() {
   let basket = localStorage.getItem('basket');
   if (basket == null) {
@@ -81,12 +80,12 @@ function getBasket() {
     return JSON.parse(basket);
   }
 }
-/* Fonction de sauvegarde du panier dans le localstorage au format JSON */
+/* Sauvegarde du panier dans le localStorage au format JSON */
 function saveBasket(basket) {
   localStorage.setItem('basket', JSON.stringify(basket));
 }
 
-/* Fonction de remplissage des produits dans le panier */
+/* Push des produits dans le localStorage */
 function pushToBasket(selectedItem) {
   let basket = getBasket();
   let itemFound = basket.find(

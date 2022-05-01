@@ -1,7 +1,3 @@
-/** récupération des données présentes dans le localStorage */
-let basket = JSON.parse(localStorage.getItem('basket'));
-console.log(basket);
-
 /** initialisation de l'array qui servira à contenir les prix
  * des produits séléctionnés dans le panier
  */
@@ -27,7 +23,7 @@ function getBasket() {
         .then((productData) => {
           console.log(productData);
           const basketItem = document.querySelector('#cart__items');
-          /** push du prix du produit dans le array Prices */
+          /** push du prix du produit dans l'array Prices */
           prices.push(productData.price);
           /* Création de l'élément HTML article */
           let productArticle = document.createElement('article');
@@ -108,8 +104,8 @@ function getBasket() {
           productDelete.appendChild(productDeleteButton);
           productDeleteButton.textContent = 'Supprimer';
 
-          modifyQuantity();
-          deleteItem(productDeleteButton, productId, productColor);
+          modifyQuantity(basket);
+          deleteItem(productDeleteButton, productId, productColor, basket);
           totalItems(prices);
         })
         .catch((error) => {
@@ -120,8 +116,8 @@ function getBasket() {
 }
 getBasket();
 
-/* fonction de modification de la quantité des produits avec écoute du change */
-function modifyQuantity() {
+/* Modification de la quantité des produits avec écoute du change */
+function modifyQuantity(basket) {
   const modifQuantity = document.querySelectorAll('.itemQuantity');
 
   for (let i = 0; i < modifQuantity.length; i++) {
@@ -141,14 +137,14 @@ function modifyQuantity() {
   }
 }
 
-/** fonction servant à supprimer un produit du panier */
-function deleteItem(productDeleteButton, productId, productColor) {
+/** Suppression d'un produit du panier */
+function deleteItem(productDeleteButton, productId, productColor, basket) {
   productDeleteButton.addEventListener('click', (e) => {
     e.preventDefault();
     /* demande de confirmation de la suppression de l'article */
     if (window.confirm(`Êtes-vous sur de vouloir supprimer cet article ?`)) {
       basket = basket.filter(
-        (el) => el.id !== productId && el.color !== productColor
+        (el) => el.id !== productId || el.color !== productColor
       );
 
       localStorage.setItem('basket', JSON.stringify(basket));
@@ -157,13 +153,13 @@ function deleteItem(productDeleteButton, productId, productColor) {
   });
 }
 
-/** fonction servant à calculer le nombre de produit du panier ainsi que le prix total */
+/** Calcul du nombre de produit du panier ainsi que du prix total */
 function totalItems(prices) {
   /** calcul de la quantité */
-  let productQuantity = document.getElementsByClassName('itemQuantity');
+  let productQuantity = document.querySelectorAll('.itemQuantity');
 
   let totalQuantitySelect = 0;
-  let totalQuantityItems = document.getElementById('totalQuantity');
+  let totalQuantityItems = document.querySelector('#totalQuantity');
 
   for (let i = 0; i < productQuantity.length; i++) {
     totalQuantitySelect += productQuantity[i].valueAsNumber;
@@ -172,11 +168,163 @@ function totalItems(prices) {
 
   /** calcul du prix */
   let totalPrice = 0;
-  let totalPriceItems = document.getElementById('totalPrice');
+  let totalPriceItems = document.querySelector('#totalPrice');
 
   for (let i = 0; i < productQuantity.length; i++) {
-    totalPrice += productQuantity[i].valueAsNumber * prices;
+    totalPrice += productQuantity[i].valueAsNumber * prices[i];
   }
-
   totalPriceItems.textContent = totalPrice;
 }
+
+/*******   FORMULAIRE   *******/
+
+/** fonction de vérification des champs du formulaire remplis par l'utilisateur */
+function getUserForm() {
+  let inputs = document.querySelectorAll('input');
+
+  /** Affichage des erreurs en cas de données de formulaire non valide */
+  const errorMessage = (tag, message, valid) => {
+    const displayErrorMessage = document.querySelector('#' + tag + 'ErrorMsg');
+
+    if (!valid) {
+      displayErrorMessage.textContent = message;
+    } else {
+      displayErrorMessage.textContent = '';
+    }
+  };
+
+  /** Mise en place des Regex pour chaque champ */
+
+  const firstNameChecker = (value) => {
+    if (value.match(/^[a-zéèôöîïûùü' -]{2,50}$/gi)) {
+      errorMessage('firstName', '', true);
+      firstName = value;
+    } else {
+      errorMessage(
+        'firstName',
+        'Le prénom ne doit pas contenir de chiffres ni de caractères spéciaux'
+      );
+    }
+  };
+  const lastNameChecker = (value) => {
+    if (value.match(/^[a-zéèôöîïûùü' -]{2,50}$/gi)) {
+      errorMessage('lastName', '', true);
+      lastName = value;
+    } else {
+      errorMessage(
+        'lastName',
+        'Le nom ne doit pas contenir de chiffres ni de caractères spéciaux'
+      );
+    }
+  };
+  const addressChecker = (value) => {
+    if (value.match(/^[0-9]{1,4}[a-zéèôöîïûùü' -]{2,50}$/gi)) {
+      errorMessage('address', '', true);
+      address = value;
+    } else {
+      errorMessage(
+        'address',
+        "Vous ne pouvez utiliser que des chiffres, lettres, espaces, - et '"
+      );
+    }
+  };
+  const cityChecker = (value) => {
+    if (value.match(/^[a-zéèôöîïûùü' -]{2,50}$/gi)) {
+      errorMessage('city', '', true);
+      city = value;
+    } else {
+      errorMessage(
+        'city',
+        "Vous ne pouvez utiliser que des lettres, espaces, - et '"
+      );
+    }
+  };
+  const emailChecker = (value) => {
+    if (value.match(/^[a-z0-9.-_]+[@]{1}[a-z0-9.-_]+[.]{1}[a-z]{2,10}$/gi)) {
+      errorMessage('email', '', true);
+      email = value;
+    } else {
+      errorMessage('email', 'Veuillez saisir une adresse email valide');
+    }
+  };
+
+  inputs.forEach((input) => {
+    input.addEventListener('input', (e) => {
+      switch (e.target.id) {
+        case 'firstName':
+          firstNameChecker(e.target.value);
+          break;
+        case 'lastName':
+          lastNameChecker(e.target.value);
+          break;
+        case 'address':
+          addressChecker(e.target.value);
+          break;
+        case 'city':
+          cityChecker(e.target.value);
+          break;
+        case 'email':
+          emailChecker(e.target.value);
+          break;
+
+        default:
+          null;
+      }
+    });
+  });
+}
+getUserForm();
+
+/* Initialisation de l'array de produit qui sera envoyé à l'API */
+let products = [];
+
+let form = document.querySelector('.cart__order__form');
+let basket = JSON.parse(localStorage.getItem('basket'));
+
+/* Pour chaque produit du panier, on push le productId dans l'array products */
+for (let product of basket) {
+  products.push(product.id);
+  console.log(products);
+}
+
+/* Ecoute de l'event submit de form */
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  /* Création de l'objet contact qui sera envoyé à l'API*/
+  let contact = {
+    firstName: form.firstName.value,
+    lastName: form.lastName.value,
+    address: form.address.value,
+    city: form.city.value,
+    email: form.email.value,
+  };
+  /* Envoi de l'objet contact et des produits à l'API */
+  fetch('http://localhost:3000/api/products/order', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ contact, products }),
+  })
+    /* Réponse de l'API au format JSON */
+    .then((response) => response.json())
+    /* Définition de la réponse de l'API en tant que orderDetails et définition de l'action à exécuter */
+    .then((orderDetails) => {
+      /* Obtention de l'élément orderId à partir de la réponse de l'API et affectation dans 
+      une variable pour une utilisation ultérieure dans l'url */
+      let orderId = orderDetails.orderId;
+      if (orderId) {
+        /* Redirection de l'utilisateur sur la page de confirmation et ajout de l'orderId dans l'url */
+        window.location.href = `./confirmation.html?id=${orderId}`;
+      } else {
+        alert(
+          'Il semble y avoir un problème. Veuillez ré-essayer ultérieurement'
+        );
+      }
+    })
+    .catch((error) => {
+      console.log(
+        "L'envoi du formulaire à l'API a rencontré un problème" + error
+      );
+    });
+});
