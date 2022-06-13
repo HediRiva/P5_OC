@@ -35,7 +35,6 @@ function addToBasket() {
   const addToBasketBtn = document.querySelector('#addToCart');
   addToBasketBtn.addEventListener('click', () => {
     let productName = document.querySelector('#title').textContent;
-    // let productPrice = document.querySelector('#price').textContent;
     let selectedColor = document.querySelector('#colors').value;
     let selectedQty = document.querySelector('#quantity').value;
     let selectedItem = {
@@ -51,18 +50,7 @@ function addToBasket() {
     if (colors.value !== '' && quantity.value > 0 && quantity.value <= 100) {
       pushToBasket(selectedItem);
       /* Fonction servant à passer sur la page panier ou bien à continuer le shopping en retournant sur la page d'accueil*/
-      const basketConfirmation = () => {
-        if (
-          window.confirm(
-            "Produit(s) ajouté(s) au panier ! \nSi vous souhaitez accéder au panier cliquez sur OK, pour continuer le shopping et voir d'autres modèles cliquez sur annuler ! "
-          )
-        ) {
-          window.location.href = 'cart.html';
-        } else {
-          window.location.href = 'index.html';
-        }
-      };
-      basketConfirmation();
+      alert('Votre choix a bien été enregistré,\narticle ajouté au panier !');
     } else {
       alert(
         'Veuillez sélectionner au moins une couleur et une quantité de 1 à 100 maximum'

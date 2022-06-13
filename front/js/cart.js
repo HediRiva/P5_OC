@@ -218,7 +218,7 @@ function getUserForm() {
     }
   };
   const addressChecker = (value) => {
-    if (value.match(/^[0-9]{1,4}[a-zéèôöîïûùü' -]{2,50}$/gi)) {
+    if (value.match(/^[0-9a-zéèôöîïûùü' -]{2,50}$/gi)) {
       errorMessage('address', '', true);
       address = value;
     } else {
@@ -240,7 +240,7 @@ function getUserForm() {
     }
   };
   const emailChecker = (value) => {
-    if (value.match(/^[a-z0-9.-_]+[@]{1}[a-z0-9.-_]+[.]{1}[a-z]{2,10}$/gi)) {
+    if (value.match(/^[a-z0-9.-_]+[@]{1}[a-z0-9.-_]+[.]{1}[a-z]{2,3}$/gi)) {
       errorMessage('email', '', true);
       email = value;
     } else {
@@ -316,6 +316,7 @@ form.addEventListener('submit', (e) => {
       if (orderId) {
         /* Redirection de l'utilisateur sur la page de confirmation et ajout de l'orderId dans l'url */
         window.location.href = `./confirmation.html?id=${orderId}`;
+        localStorage.clear();
       } else {
         alert(
           'Il semble y avoir un problème. Veuillez ré-essayer ultérieurement'
